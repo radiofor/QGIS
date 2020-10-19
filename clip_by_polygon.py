@@ -4,11 +4,11 @@ from osgeo import ogr
 
 
 data_name = ''
-shp_path = r'G:\RockGlacier\India\Himachal\Boundary\Himachal.shp'
-img_path = r'G:\RockGlacier\India\Himachal\QGIS\Google'
-wf_path = r'G:\RockGlacier\India\Himachal\QGIS\WorldFile'
+shp_path = r'G:\RockGlacier\China-Nepal\Boundary\truth_retrain.shp'
+img_path = r'G:\RockGlacier\China-Nepal\QGIS\Bing'
+wf_path = r'G:\RockGlacier\China-Nepal\QGIS\WorldFile'
 img_suffix = 'jpg'
-wf_suffix = 'jpw'
+wf_suffix = 'jgw'
 
 # 像素[高, 宽]
 px_geosize = [2.645859085290482, 2.6458015267176016]
@@ -27,26 +27,31 @@ shp_ds = ogr.Open(shp_path)
 lyr = shp_ds.GetLayer()
 geoms = ogr.Geometry(ogr.wkbMultiPolygon)
 for feat in lyr:
-    geoms.AddGeometry(feat.GetGeometryRef())
+    geom = feat.GetGeometryRef()
+    if geom.GetGeometryName() == 'MULTIPOLYGON':
+        for geom_part in geom:
+            geoms.AddGeometry(geom_part)
+    else:
+        geoms.AddGeometry(geom)
 
 # Polygon坐标范围[min_x, max_x, min_y, max_y]
-geom_evlp = geoms.GetEnvelope()
+lyr_extent = lyr.GetExtent()
 # 以重叠尺寸略微扩大坐标范围，可删除
-geom_evlp = [geom_evlp[0] - overlay_geosize[1], geom_evlp[1] + overlay_geosize[1],
-             geom_evlp[2] - overlay_geosize[0], geom_evlp[3] + overlay_geosize[0]]
+lyr_extent = [lyr_extent[0] - overlay_geosize[1], lyr_extent[1] + overlay_geosize[1],
+             lyr_extent[2] - overlay_geosize[0], lyr_extent[3] + overlay_geosize[0]]
 
 # 坐标范围内的按裁剪尺寸划分的条带数量
-clip_count = [int((geom_evlp[3] - geom_evlp[2]) / offset_geosize[0]) + 1,
-              int((geom_evlp[1] - geom_evlp[0]) / offset_geosize[1]) + 1]
+clip_count = [int((lyr_extent[3] - lyr_extent[2]) / offset_geosize[0]) + 1,
+              int((lyr_extent[1] - lyr_extent[0]) / offset_geosize[1]) + 1]
 print(clip_count)
 
 for i in range(clip_count[0]):
     for j in range(clip_count[1]):
         # 待裁剪影像的坐标范围[min_x, min_y, max_x, max_y]
-        clip_ext = (geom_evlp[0] + offset_geosize[0] * j,
-                    geom_evlp[3] - offset_geosize[0] * i - clip_geosize[0],
-                    geom_evlp[0] + offset_geosize[0] * j + clip_geosize[1],
-                    geom_evlp[3] - offset_geosize[0] * i)
+        clip_ext = (lyr_extent[0] + offset_geosize[0] * j,
+                    lyr_extent[3] - offset_geosize[0] * i - clip_geosize[0],
+                    lyr_extent[0] + offset_geosize[0] * j + clip_geosize[1],
+                    lyr_extent[3] - offset_geosize[0] * i)
 
         # 根据单幅影像的地理范围创建Polygon
         clip_ring = ogr.Geometry(ogr.wkbLinearRing)
