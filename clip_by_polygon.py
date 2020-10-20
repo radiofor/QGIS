@@ -3,10 +3,10 @@ import os
 from osgeo import ogr
 
 
-data_name = ''
-shp_path = r'G:\RockGlacier\China-Nepal\Boundary\truth_retrain.shp'
-img_path = r'G:\RockGlacier\China-Nepal\QGIS\Bing'
-wf_path = r'G:\RockGlacier\China-Nepal\QGIS\WorldFile'
+data_name = 'Nepal'
+shp_dir = r'G:\RockGlacier\China-Nepal\Boundary\truth_retrain.shp'
+img_dir = r'G:\RockGlacier\China-Nepal\QGIS\Mask'
+wf_dir = r'G:\RockGlacier\China-Nepal\QGIS\WorldFile'
 img_suffix = 'jpg'
 wf_suffix = 'jgw'
 
@@ -23,7 +23,7 @@ overlay_geosize = [a * b for a, b in zip(overlay_size, px_geosize)]
 # 每次裁剪偏移的坐标尺寸
 offset_geosize = [a - b for a, b in zip(clip_geosize, overlay_geosize)]
 
-shp_ds = ogr.Open(shp_path)
+shp_ds = ogr.Open(shp_dir)
 lyr = shp_ds.GetLayer()
 geoms = ogr.Geometry(ogr.wkbMultiPolygon)
 for feat in lyr:
@@ -67,10 +67,10 @@ for i in range(clip_count[0]):
             continue
 
         # 设置名称
-        name = data_name + '_{0}_{1}'.format(str(i).zfill(3), str(j).zfill(3))
+        img_name = data_name + '_{0}_{1}'.format(str(i).zfill(3), str(j).zfill(3))
 
         # 创建World File
-        with open(os.path.join(wf_path, name + '.' + wf_suffix), 'w') as f:
+        with open(os.path.join(wf_dir, img_name + '.' + wf_suffix), 'w') as f:
             f.writelines([str(px_geosize[0]) + '\n', str(0) + '\n', str(0) + '\n',
                           str(-px_geosize[1]) + '\n', str(clip_ext[0]) + '\n', str(clip_ext[3]) + '\n'])
 
@@ -89,6 +89,6 @@ for i in range(clip_count[0]):
         job.start()
         job.waitForFinished()
         image = job.renderedImage()
-        image.save(os.path.join(img_path, name + '.' + img_suffix))
+        image.save(os.path.join(img_dir, img_name + '.' + img_suffix))
 
 print('task finished!')
