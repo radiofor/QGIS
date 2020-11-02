@@ -44,6 +44,7 @@ lyr_extent = [lyr_extent[0] - overlay_geosize[1], lyr_extent[1] + overlay_geosiz
 clip_count = [int((lyr_extent[3] - lyr_extent[2]) / offset_geosize[0]) + 1,
               int((lyr_extent[1] - lyr_extent[0]) / offset_geosize[1]) + 1]
 print(clip_count)
+max_len = len(str(max(clip_count)))
 
 m, n = 0, 0
 part_dir = os.path.join(img_dir, str(n))
@@ -52,6 +53,7 @@ if not os.path.exists(part_dir):
 for i in range(clip_count[0]):
     for j in range(clip_count[1]):
         if m == 5000:
+            m = 0
             n += 1
             part_dir = os.path.join(img_dir, str(n))
             if not os.path.exists(part_dir):
@@ -77,7 +79,7 @@ for i in range(clip_count[0]):
             continue
 
         # 设置名称
-        img_name = data_name + '_{0}_{1}'.format(str(i).zfill(3), str(j).zfill(3))
+        img_name = data_name + '_{0}_{1}'.format(str(i).zfill(max_len), str(j).zfill(max_len))
 
         # 创建World File
         with open(os.path.join(wf_dir, img_name + '.' + wf_suffix), 'w') as f:
