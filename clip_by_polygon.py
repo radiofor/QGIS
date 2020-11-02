@@ -3,10 +3,10 @@ import os
 from osgeo import ogr
 
 
-data_name = 'Nepal'
-shp_dir = r'G:\RockGlacier\China-Nepal\Boundary\truth_retrain.shp'
-img_dir = r'G:\RockGlacier\China-Nepal\QGIS\Mask'
-wf_dir = r'G:\RockGlacier\China-Nepal\QGIS\WorldFile'
+data_name = 'Nyenchenthanglha'
+shp_dir = r'G:\RockGlacier\Nyenchenthanglha\Boundary\bounds_3857.shp'
+img_dir = r'G:\RockGlacier\Nyenchenthanglha\QGIS\GaoFen-1'
+wf_dir = r'G:\RockGlacier\Nyenchenthanglha\QGIS\WorldFile'
 img_suffix = 'jpg'
 wf_suffix = 'jgw'
 
