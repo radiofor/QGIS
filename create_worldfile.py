@@ -5,7 +5,6 @@ from osgeo import ogr
 
 data_name = 'Himalaya'
 shp_dir = r'G:\RockGlacier\Himalaya\Boundary\Himalaya.shp'
-img_dir = r'G:\RockGlacier\Himalaya\QGIS\Google'
 wf_dir = r'G:\RockGlacier\Himalaya\QGIS\WorldFile'
 img_suffix = 'jpg'
 wf_suffix = 'jgw'
@@ -46,20 +45,8 @@ clip_count = [int((lyr_extent[3] - lyr_extent[2]) / offset_geosize[0]) + 1,
 print(clip_count)
 max_len = len(str(max(clip_count)))
 
-m, n = 0, 0
-part_dir = os.path.join(img_dir, str(n))
-if not os.path.exists(part_dir):
-    os.mkdir(part_dir)
-
 for i in range(clip_count[0]):
     for j in range(clip_count[1]):
-        if m == 5000:
-            m = 0
-            n += 1
-            part_dir = os.path.join(img_dir, str(n))
-            if not os.path.exists(part_dir):
-                os.mkdir(part_dir)
-
         # 待裁剪影像的坐标范围[min_x, min_y, max_x, max_y]
         clip_ext = (lyr_extent[0] + offset_geosize[0] * j,
                     lyr_extent[3] - offset_geosize[0] * i - clip_geosize[0],
@@ -83,27 +70,6 @@ for i in range(clip_count[0]):
         img_name = data_name + '_{0}_{1}'.format(str(i).zfill(max_len), str(j).zfill(max_len))
 
         # 创建World File
-        # with open(os.path.join(wf_dir, img_name + '.' + wf_suffix), 'w') as f:
-        #     f.writelines([str(px_geosize[0]) + '\n', str(0) + '\n', str(0) + '\n',
-        #                   str(-px_geosize[1]) + '\n', str(clip_ext[0]) + '\n', str(clip_ext[3]) + '\n'])
-
-        # 将待裁剪影像的坐标范围转为QGIS格式
-        rect = QgsRectangle(clip_ext[0], clip_ext[1], clip_ext[2], clip_ext[3])
-
-        # 图片保存设置
-        settings = iface.mapCanvas().mapSettings()
-        # 设置图片分辨率，默认为96 dpi，若不改可以不写
-        settings.setOutputDpi(96)
-        # 设置坐标范围
-        settings.setExtent(rect)
-        # 设置像素尺寸
-        settings.setOutputSize(QSize(clip_size[1], clip_size[0]))
-        job = QgsMapRendererSequentialJob(settings)
-        job.start()
-        job.waitForFinished()
-        image = job.renderedImage()
-        image.save(os.path.join(part_dir, img_name + '.' + img_suffix))
-
-        m += 1
-
-print('task finished!')
+        with open(os.path.join(wf_dir, img_name + '.' + wf_suffix), 'w') as f:
+            f.writelines([str(px_geosize[0]) + '\n', str(0) + '\n', str(0) + '\n',
+                          str(-px_geosize[1]) + '\n', str(clip_ext[0]) + '\n', str(clip_ext[3]) + '\n'])
