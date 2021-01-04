@@ -4,9 +4,9 @@ from osgeo import ogr
 
 
 data_name = 'Himalaya'
-shp_dir = r'G:\RockGlacier\Himalaya\Boundary\Himalaya.shp'
-img_dir = r'G:\RockGlacier\Himalaya\QGIS\Google'
-wf_dir = r'G:\RockGlacier\Himalaya\QGIS\WorldFile'
+shp_dir = r'J:\VOC\Shapefiles\part.shp'
+img_dir = r'J:\VOC\Labels'
+wf_dir = r'J:\VOC\WorldFiles'
 img_suffix = 'jpg'
 wf_suffix = 'jgw'
 
@@ -46,20 +46,8 @@ clip_count = [int((lyr_extent[3] - lyr_extent[2]) / offset_geosize[0]) + 1,
 print(clip_count)
 max_len = len(str(max(clip_count)))
 
-m, n = 0, 0
-part_dir = os.path.join(img_dir, str(n))
-if not os.path.exists(part_dir):
-    os.mkdir(part_dir)
-
 for i in range(clip_count[0]):
     for j in range(clip_count[1]):
-        if m == 5000:
-            m = 0
-            n += 1
-            part_dir = os.path.join(img_dir, str(n))
-            if not os.path.exists(part_dir):
-                os.mkdir(part_dir)
-
         # 待裁剪影像的坐标范围[min_x, min_y, max_x, max_y]
         clip_ext = (lyr_extent[0] + offset_geosize[0] * j,
                     lyr_extent[3] - offset_geosize[0] * i - clip_geosize[0],
@@ -102,8 +90,6 @@ for i in range(clip_count[0]):
         job.start()
         job.waitForFinished()
         image = job.renderedImage()
-        image.save(os.path.join(part_dir, img_name + '.' + img_suffix))
-
-        m += 1
+        image.save(os.path.join(img_dir, img_name + '.' + img_suffix))
 
 print('task finished!')

@@ -1,18 +1,29 @@
 # -*- coding: utf-8 -*-
 import os
-from osgeo import ogr
+from PIL import Image
+import numpy as np
 
 
-data_name = 'Nepal'
-img_dir = r'G:\RockGlacier\China-Nepal\QGIS\Mask'
-wf_dir = r'G:\RockGlacier\China-Nepal\QGIS\WorldFile'
+img_dir = r'G:\RockGlacier\Himalaya\QGIS\Lable\0'
+wf_dir = r'G:\RockGlacier\Himalaya\QGIS\WorldFile\0'
+idx_path = r'G:\RockGlacier\Himalaya\VOC\Index\val.txt'
 img_suffix = 'jpg'
 wf_suffix = 'jgw'
 
 # 单幅影像的像素尺寸
 clip_size = [1000, 1000]
 
-wf_names = os.listdir(wf_dir)
+wf_names = []
+if os.path.exists(idx_path):
+    with open(idx_path, 'r') as f:
+        line = f.readline().strip()
+        while line:
+            wf_name = line + '.' + wf_suffix
+            wf_names.append(wf_name)
+            line = f.readline().strip()
+else:
+    wf_names = os.listdir(wf_dir)
+
 for wf_name in wf_names:
     wf_path = os.path.join(wf_dir, wf_name)
     wf_paras = []
@@ -46,6 +57,6 @@ for wf_name in wf_names:
     job.start()
     job.waitForFinished()
     image = job.renderedImage()
-    image.save(os.path.join(img_dir, img_name + '.' + img_suffix))
-
+    img_path = os.path.join(img_dir, img_name + '.' + img_suffix)
+    image.save(img_path)
 print('task finished!')

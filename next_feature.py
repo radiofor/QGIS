@@ -2,9 +2,9 @@
 import os
 
 
-idx_path = r'G:\ResearchArea\Nepal\iterrate.txt'
-px_geosize = [1.9866146726862781, 1.9843750309028716]
-pad_size = [150, 150]
+idx_path = r'G:\RockGlacier\Himalaya\Boundary\iterrate.txt'
+px_geosize = [2.645859085290482, 2.6458015267176016]
+pad_size = [10, 10]
 pad_geosize = [a * b for a, b in zip(pad_size, px_geosize)]
 
 mc = iface.mapCanvas()
